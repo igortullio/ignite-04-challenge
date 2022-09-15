@@ -8,63 +8,62 @@ import { stripe } from '../libs/stripe'
 import * as S from '../styles/pages/success'
 
 interface SuccessProps {
-  custumerName: string
-  product: {
-    name: string
-    imageUrl: string
-  }
+	custumerName: string
+	product: {
+		name: string
+		imageUrl: string
+	}
 }
 
 export default function Success({ custumerName, product }: SuccessProps) {
-  return (
-    <>
-      <Head>
-        <title>Compra efetuada | Ignite shop</title>
-        <meta name="robots" content="noindex" />
-      </Head>
-      <S.Container>
-        <h1>Compra efetuada</h1>
+	return (
+		<>
+			<Head>
+				<title>Compra efetuada | Ignite shop</title>
+				<meta name="robots" content="noindex" />
+			</Head>
+			<S.Container>
+				<h1>Compra efetuada</h1>
 
-        <S.ImageContainer>
-          <Image src={product.imageUrl} width={120} height={110} alt="" />
-        </S.ImageContainer>
+				<S.ImageContainer>
+					<Image src={product.imageUrl} width={120} height={110} alt="" />
+				</S.ImageContainer>
 
-        <p>
-          Uhuul <strong>{custumerName}</strong>, sua{' '}
-          <strong>{product.name}</strong> já está a caminho da sua casa.
-        </p>
+				<p>
+					Uhuul <strong>{custumerName}</strong>, sua <strong>{product.name}</strong> já está a caminho da sua casa.
+				</p>
 
-        <Link href="/">Voltar ao catálogo</Link>
-      </S.Container>
-    </>
-  )
+				<Link href="/">Voltar ao catálogo</Link>
+			</S.Container>
+		</>
+	)
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  if (!query.session_id) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    }
-  }
+	if (!query.session_id) {
+		return {
+			redirect: {
+				destination: '/',
+				permanent: false
+			}
+		}
+	}
 
-  const sessionId = String(query.session_id)
+	const sessionId = String(query.session_id)
 
-  const session = await stripe.checkout.sessions.retrieve(sessionId, {
-    expand: ['line_items', 'line_items.data.price.product'],
-  })
+	const session = await stripe.checkout.sessions.retrieve(sessionId, {
+		expand: ['line_items', 'line_items.data.price.product']
+	})
 
-  const product = session.line_items.data[0].price.product as Stripe.Product
+	const product = session.line_items.data[0].price.product as Stripe.Product
 
-  return {
-    props: {
-      custumerName: session.customer_details.name,
-      product: {
-        name: product.name,
-        imageUrl: product.images[0],
-      },
-    },
-  }
+	return {
+		props: {
+			custumerName: session.customer_details.name,
+			product: {
+				name: product.name,
+				imageUrl: product.images[0]
+			}
+		}
+	}
 }
