@@ -1,9 +1,8 @@
-import axios from 'axios'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import Image from 'next/future/image'
 import Head from 'next/head'
-import { useState } from 'react'
 import Stripe from 'stripe'
+import { useShoppingCart } from 'use-shopping-cart'
 import { stripe } from '../../libs/stripe'
 
 import * as S from '../../styles/pages/product'
@@ -13,7 +12,8 @@ interface Product {
 	name: string
 	description: string
 	imageUrl: string
-	price: string
+	priceFormated: string
+	price: number
 	defaultPriceId: string
 }
 
@@ -22,22 +22,10 @@ interface ProductProps {
 }
 
 export default function Product({ product }: ProductProps) {
-	const [isCreationgCheckoutSession, setIsCreationgCheckoutSession] = useState(false)
+	const { addItem } = useShoppingCart()
 
 	async function handleBuyProduct() {
-		try {
-			setIsCreationgCheckoutSession(true)
-
-			const response = await axios.post('/api/checkout', {
-				priceId: product.defaultPriceId
-			})
-
-			const { checkoutUrl } = response.data
-			window.location.href = checkoutUrl
-		} catch (error) {
-			setIsCreationgCheckoutSession(false)
-			alert('Falha ao redirecionar ao checkout!')
-		}
+		addItem({ name: product.name, sku: product.id, price: product.price, currency: 'BRL' })
 	}
 
 	return (
@@ -52,13 +40,11 @@ export default function Product({ product }: ProductProps) {
 
 				<S.ProductDetails>
 					<h1>{product.name}</h1>
-					<span>{product.price}</span>
+					<span>{product.priceFormated}</span>
 
 					<p>{product.description}</p>
 
-					<button onClick={handleBuyProduct} disabled={isCreationgCheckoutSession}>
-						Comprar agora
-					</button>
+					<button onClick={handleBuyProduct}>Colocar na sacola</button>
 				</S.ProductDetails>
 			</S.Container>
 		</>
@@ -86,7 +72,8 @@ export const getStaticProps: GetStaticProps<ProductProps, { id: string }> = asyn
 				name: product.name,
 				description: product.description,
 				imageUrl: product.images[0],
-				price: new Intl.NumberFormat('pt-BR', {
+				price: price.unit_amount,
+				priceFormated: new Intl.NumberFormat('pt-BR', {
 					style: 'currency',
 					currency: 'BRL'
 				}).format(price.unit_amount / 100),
