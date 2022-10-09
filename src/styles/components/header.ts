@@ -26,7 +26,12 @@ export const CartButton = styled('button', {
 		color: '$gray500'
 	},
 
-	'&:hover': {
+	'&:disabled': {
+		cursor: 'not-allowed',
+		opacity: 0.6
+	},
+
+	'&:not(:disabled):hover': {
 		svg: {
 			color: '$gray300'
 		},

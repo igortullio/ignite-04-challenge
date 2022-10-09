@@ -6,9 +6,9 @@ interface CartContextProviderProps {
 }
 
 export function CartContextProvider({ children }: CartContextProviderProps) {
-	const stripePublicKey = process.env.STRIPE_PUBLIC_KEY
-	const successUrl = `${process.env.NEXT_URL}/success?session_id={CHECKOUT_SESSION_ID}`
-	const cancelUrl = `${process.env.NEXT_URL}/`
+	const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY
+	const successUrl = `${process.env.NEXT_PUBLIC_NEXT_URL}/success?session_id={CHECKOUT_SESSION_ID}`
+	const cancelUrl = `${process.env.NEXT_PUBLIC_NEXT_URL}/`
 
 	return (
 		<CartProvider
@@ -18,7 +18,7 @@ export function CartContextProvider({ children }: CartContextProviderProps) {
 			successUrl={successUrl}
 			cancelUrl={cancelUrl}
 			currency="BRL"
-			allowedCountries={['BRL']}
+			allowedCountries={['BZ']}
 		>
 			{children}
 		</CartProvider>

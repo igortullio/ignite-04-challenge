@@ -25,7 +25,14 @@ export default function Product({ product }: ProductProps) {
 	const { addItem } = useShoppingCart()
 
 	async function handleBuyProduct() {
-		addItem({ name: product.name, sku: product.id, price: product.price, currency: 'BRL' })
+		addItem({
+			name: product.name,
+			sku: product.id,
+			price: product.price,
+			currency: 'BRL',
+			image: product.imageUrl,
+			price_id: product.defaultPriceId
+		})
 	}
 
 	return (
